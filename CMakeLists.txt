@@ -30,11 +30,15 @@ option(RPATH "Relative Runtime Path" OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules
                       ${CMAKE_MODULE_PATH})
 
+set(ENV{PKG_CONFIG_PATH} /usr/lib/x86_x64-linux-gnu/pkgconfig)
+find_package(PkgConfig REQUIRED)
+
 #Find optional libraries
-find_package(Magick++)
+pkg_check_modules(Magick++ REQUIRED IMPORTED_TARGET ImageMagick++)
 
 if(Magick++_FOUND)
 include_directories(${Magick++_INCLUDE_DIRS})
+include_directories(${Magick++_INCLUDE_DIRS} ${Magick++_ARCH_INCLUDE_DIR})
 add_definitions(-DMAGICKPP_FOUND=1)
 add_definitions(-DMAGICKCORE_HDRI_ENABLE=0)
 add_definitions(-DMAGICKCORE_QUANTUM_DEPTH=16)
