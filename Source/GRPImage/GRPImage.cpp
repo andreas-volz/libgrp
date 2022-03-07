@@ -25,12 +25,16 @@ void GRPImage::LoadImage(std::vector<char> *inputImage, bool removeDuplicates)
     std::vector<char>::iterator currentDataPosition = inputImage->begin();
     
     //Get basic GRP header info
-    //(currentDataPosition += 2) will push the iterator forward
-    std::copy(currentDataPosition,(currentDataPosition += 2),(char *) &numberOfFrames);
+    std::copy(currentDataPosition,(currentDataPosition + 2),(char *) &numberOfFrames);
+    currentDataPosition += 2;
     
     //Get the maximum image width & height
-    std::copy(currentDataPosition, (currentDataPosition += 2),(char *) &maxImageWidth);
-    std::copy(currentDataPosition, (currentDataPosition += 2),(char *) &maxImageHeight);
+    std::copy(currentDataPosition, (currentDataPosition + 2),(char *) &maxImageWidth);
+    currentDataPosition += 2;
+
+    std::copy(currentDataPosition, (currentDataPosition + 2),(char *) &maxImageHeight);
+    currentDataPosition += 2;
+
 #if VERBOSE >= 2
     std::cout << "GRP Image Number of Frames: " << numberOfFrames << " maxWidth: " << maxImageWidth << " maxHeight: " << maxImageHeight << '\n';
 #endif
@@ -49,18 +53,23 @@ void GRPImage::LoadImage(std::vector<char> *inputImage, bool removeDuplicates)
         GRPFrame *currentImageFrame = new GRPFrame;
         
         //Read in the image xOffset
-        std::copy(currentDataPosition, (currentDataPosition += 1),(char *) &tempValue1);
+        std::copy(currentDataPosition, (currentDataPosition + 1),(char *) &tempValue1);
+        currentDataPosition += 1;
         //Read in the image yOffset
-        std::copy(currentDataPosition, (currentDataPosition += 1),(char *) &tempValue2);
+        std::copy(currentDataPosition, (currentDataPosition + 1),(char *) &tempValue2);
+        currentDataPosition += 1;
         currentImageFrame->SetImageOffsets(tempValue1, tempValue2);
         
         //Read in the image width
-        std::copy(currentDataPosition, (currentDataPosition += 1),(char *) &tempValue1);
+        std::copy(currentDataPosition, (currentDataPosition + 1),(char *) &tempValue1);
+        currentDataPosition += 1;
         //Read in the image height
-        std::copy(currentDataPosition, (currentDataPosition += 1),(char *) &tempValue2);
+        std::copy(currentDataPosition, (currentDataPosition + 1),(char *) &tempValue2);
+        currentDataPosition += 1;
         currentImageFrame->SetImageSize(tempValue1, tempValue2);
         //Read in the image dataOffset
-        std::copy(currentDataPosition, (currentDataPosition += 4),(char *) &tempDataOffset);
+        std::copy(currentDataPosition, (currentDataPosition + 4),(char *) &tempDataOffset);
+        currentDataPosition += 4;
         currentImageFrame->SetDataOffset(tempDataOffset);
         
         
@@ -319,7 +328,8 @@ void GRPImage::DecodeGRPFrameData(std::vector<char> *inputData, GRPFrame *target
     //Read in the ImageRow offsets
     for (int currentReadingRowOffset = 0; currentReadingRowOffset < targetFrame->GetImageHeight(); currentReadingRowOffset++)
     {
-        std::copy(currentDataPosition, (currentDataPosition += 2),(char *) &imageRowOffsets.at(currentReadingRowOffset));
+        std::copy(currentDataPosition, (currentDataPosition + 2),(char *) &imageRowOffsets.at(currentReadingRowOffset));
+        currentDataPosition += 2;
     }
     
     //The currentRow (x coordinate) that the decoder is at, it is used to
@@ -358,7 +368,8 @@ void GRPImage::DecodeGRPFrameData(std::vector<char> *inputData, GRPFrame *target
         
         while(currentProcessingRow < targetFrame->GetImageWidth())
         {
-            std::copy(currentDataPosition, (currentDataPosition += 1),(char *) &rawPacket);
+            std::copy(currentDataPosition, (currentDataPosition + 1),(char *) &rawPacket);
+            currentDataPosition += 1;
             if(!(rawPacket & 0x80))
             {
                 //Repeat Operation (The first byte indicates a repeat pixel operation)
@@ -366,7 +377,8 @@ void GRPImage::DecodeGRPFrameData(std::vector<char> *inputData, GRPFrame *target
                 if(rawPacket & 0x40)
                 {
                     rawPacket &= 0x3f;
-                    std::copy(currentDataPosition, (currentDataPosition += 1),(char *) &convertedPacket);
+                    std::copy(currentDataPosition, (currentDataPosition + 1),(char *) &convertedPacket);
+                    currentDataPosition += 1;
                     
                     //Set the Player color (Not implemented yet :|
                     //covertedPacket = tableof unitColor[ colorbyte+gr_gamenr];
@@ -388,7 +400,8 @@ void GRPImage::DecodeGRPFrameData(std::vector<char> *inputData, GRPFrame *target
                     int operationCounter = rawPacket;
                     do
                     {
-                        std::copy(currentDataPosition, (currentDataPosition += 1),(char *) &convertedPacket);
+                        std::copy(currentDataPosition, (currentDataPosition + 1),(char *) &convertedPacket);
+                        currentDataPosition += 1;
                         
                         currentUniquePixel.xPosition = currentProcessingRow;
                         currentUniquePixel.yPosition = currentProcessingHeight;

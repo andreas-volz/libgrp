@@ -224,8 +224,8 @@ include(cmake/InstallPkgConfigFile.cmake)
 install_pkg_config_file(libgrp
 	DESCRIPTION "A library to convert Blizzard GRP images to common image formats"
     CFLAGS
-    LIBS ${Magick++_LIBRARIES}
-    REQUIRES
+    LIBS -lgrp
+    REQUIRES ${Magick++_LIBRARIES}
     VERSION ${LIBGRP_MAJOR_VERSION}.${LIBGRP_MINOR_VERSION}.${LIBGRP_PATCH_VERSION})
 
 # uninstall target
